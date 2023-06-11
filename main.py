@@ -4,7 +4,7 @@ import json
 import os
 
 app = Flask(__name__)
-CORS(app, resources={r"/api/*": {"origins": "https://adugo-game-frontend-01.onrender.com"}})
+CORS(app, resources={r"/api/*": {"origins": ["https://adugo-game-frontend-01.onrender.com", "https://adugo-game-frontend-prd.onrender.com"]}})
 
 class Cell:
     def __init__(self, classList, x, y):
