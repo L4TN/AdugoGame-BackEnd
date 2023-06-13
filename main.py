@@ -7,8 +7,15 @@ from sqlalchemy import create_engine, Column, Integer, String, Boolean
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from flask import jsonify
-
+from sqlalchemy.exc import PendingRollbackError
 from apscheduler.schedulers.background import BackgroundScheduler
+
+
+try:
+    fila = session.query(Fila).all()
+except PendingRollbackError:
+    session.rollback()
+    fila = session.query(Fila).all()
 
 
 app = Flask(__name__)
@@ -29,6 +36,11 @@ session = Session()
 
 Base = declarative_base()
 
+try:
+    fila = session.query(Fila).all()
+except PendingRollbackError:
+    session.rollback()
+    fila = session.query(Fila).all()
 
 class Jogador(Base):
     __tablename__ = 'jogador'
