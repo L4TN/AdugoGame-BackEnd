@@ -12,8 +12,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 
 
 app = Flask(__name__)
-CORS(app, resources={
-     r"/api/*": {"origins": ["https://adugo-game-prd.onrender.com/", "http://127.0.0.1:5500"]}})
+CORS(app)
 
 database = 'JogoOnca'
 user = 'MasterOnca'
