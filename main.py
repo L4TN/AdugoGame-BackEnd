@@ -72,7 +72,7 @@ session_id = 0
 file_path = "last_move.txt"
 
 
-@app.route('/api/login', methods=['GET'])
+@app.route('/api/login', methods=['POST'])
 def login():
     login = request.args.get('Login')
     senha = request.args.get('Senha')
