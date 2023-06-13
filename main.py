@@ -10,7 +10,7 @@ from flask import jsonify
 
 app = Flask(__name__)
 CORS(app, resources={
-     r"/api/*": {"origins": ["https://adugo-game-prd.onrender.com/", "http://127.0.0.1:5500"]}})
+     r"/api/*": {"origins": ["https://adugo-game-prd.onrender.com", "http://127.0.0.1:5500"]}})
 
 database = 'JogoOnca'
 user = 'MasterOnca'
@@ -72,7 +72,7 @@ session_id = 0
 file_path = "last_move.txt"
 
 
-@app.route('/api/login', methods=['POST'])
+@app.route('/api/login', methods=['GET'])
 def login():
     login = request.args.get('Login')
     senha = request.args.get('Senha')
