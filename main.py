@@ -1,35 +1,41 @@
 import random
 import json
 import os
+import threading
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from sqlalchemy import create_engine, Column, Integer, String, Boolean
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from flask import jsonify
-from sqlalchemy.exc import PendingRollbackError
-from apscheduler.schedulers.background import BackgroundScheduler
 
+from apscheduler.schedulers.background import BackgroundScheduler
 
 
 app = Flask(__name__)
 CORS(app)
 
-database = 'JogoOnca'
-user = 'MasterOnca'
-password = 'onca1020'
-host = 'jogodaonca.cveloztfcqty.us-east-1.rds.amazonaws.com'
-port = '5432'
 
-database_url = f'postgresql://{user}:{password}@{host}:{port}/{database}'
+def setup_database():
+    global Session, session
+    database = 'JogoOnca'
+    user = 'MasterOnca'
+    password = 'onca1020'
+    host = 'jogodaonca.cveloztfcqty.us-east-1.rds.amazonaws.com'
+    port = '5432'
 
-engine = create_engine(database_url)
+    database_url = f'postgresql://{user}:{password}@{host}:{port}/{database}'
 
-Session = sessionmaker(bind=engine)
-session = Session()
+    engine = create_engine(database_url)
+
+    Session = sessionmaker(bind=engine)
+    session = Session()
+
+    Base.metadata.create_all(engine)
+
+
 
 Base = declarative_base()
-
 
 
 class Jogador(Base):
@@ -60,8 +66,6 @@ class Partida(Base):
     id_usuario2 = Column(Integer)
 
 
-Base.metadata.create_all(engine)
-
 
 class Cell:
     def __init__(self, classList, x, y):
@@ -69,16 +73,17 @@ class Cell:
         self.x = x
         self.y = y
 
-try:
-    fila = session.query(Fila).all()
-except PendingRollbackError:
-    session.rollback()
-    fila = session.query(Fila).all()
-    
+
 # Inicialize last_move como um dicionário vazio
 last_move = {}
 session_id = 0
 file_path = "last_move.txt"
+
+
+def start_scheduler():
+    scheduler = BackgroundScheduler()
+    scheduler.add_job(func=create_game_party, trigger="interval", seconds=1)
+    scheduler.start()
 
 
 @app.route('/api/login', methods=['POST'])
@@ -281,4 +286,9 @@ scheduler.add_job(func=create_game_party, trigger="interval", seconds=1)
 scheduler.start()
 
 if __name__ == "__main__":
+    app.run(port=5003)
+    setup_database()
+    
+    threading.Thread(target=start_scheduler).start()
+    
     app.run(port=5003)
