@@ -11,12 +11,6 @@ from sqlalchemy.exc import PendingRollbackError
 from apscheduler.schedulers.background import BackgroundScheduler
 
 
-try:
-    fila = session.query(Fila).all()
-except PendingRollbackError:
-    session.rollback()
-    fila = session.query(Fila).all()
-
 
 app = Flask(__name__)
 CORS(app)
@@ -36,11 +30,7 @@ session = Session()
 
 Base = declarative_base()
 
-try:
-    fila = session.query(Fila).all()
-except PendingRollbackError:
-    session.rollback()
-    fila = session.query(Fila).all()
+
 
 class Jogador(Base):
     __tablename__ = 'jogador'
@@ -79,7 +69,12 @@ class Cell:
         self.x = x
         self.y = y
 
-
+try:
+    fila = session.query(Fila).all()
+except PendingRollbackError:
+    session.rollback()
+    fila = session.query(Fila).all()
+    
 # Inicialize last_move como um dicionário vazio
 last_move = {}
 session_id = 0
