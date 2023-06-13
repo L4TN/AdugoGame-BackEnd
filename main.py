@@ -16,24 +16,18 @@ app = Flask(__name__)
 CORS(app)
 
 
-def setup_database():
-    global Session, session
-    database = 'JogoOnca'
-    user = 'MasterOnca'
-    password = 'onca1020'
-    host = 'jogodaonca.cveloztfcqty.us-east-1.rds.amazonaws.com'
-    port = '5432'
+database = 'JogoOnca'
+user = 'MasterOnca'
+password = 'onca1020'
+host = 'jogodaonca.cveloztfcqty.us-east-1.rds.amazonaws.com'
+port = '5432'
 
-    database_url = f'postgresql://{user}:{password}@{host}:{port}/{database}'
+database_url = f'postgresql://{user}:{password}@{host}:{port}/{database}'
 
-    engine = create_engine(database_url)
+engine = create_engine(database_url)
 
-    Session = sessionmaker(bind=engine)
-    session = Session()
-
-    Base.metadata.create_all(engine)
-
-
+Session = sessionmaker(bind=engine)
+session = Session()
 
 Base = declarative_base()
 
@@ -66,6 +60,8 @@ class Partida(Base):
     id_usuario2 = Column(Integer)
 
 
+Base.metadata.create_all(engine)
+
 
 class Cell:
     def __init__(self, classList, x, y):
@@ -78,12 +74,6 @@ class Cell:
 last_move = {}
 session_id = 0
 file_path = "last_move.txt"
-
-
-def start_scheduler():
-    scheduler = BackgroundScheduler()
-    scheduler.add_job(func=create_game_party, trigger="interval", seconds=1)
-    scheduler.start()
 
 
 @app.route('/api/login', methods=['POST'])
@@ -281,14 +271,12 @@ def create_game_party():
                 session.commit()
 
 
-scheduler = BackgroundScheduler()
-scheduler.add_job(func=create_game_party, trigger="interval", seconds=1)
-scheduler.start()
+def start_scheduler():
+    scheduler = BackgroundScheduler()
+    scheduler.add_job(func=create_game_party, trigger="interval", seconds=1)
+    scheduler.start()
+
 
 if __name__ == "__main__":
-    app.run(port=5003)
-    setup_database()
-    
     threading.Thread(target=start_scheduler).start()
-    
     app.run(port=5003)
