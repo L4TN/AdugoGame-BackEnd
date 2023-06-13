@@ -8,12 +8,9 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from flask import jsonify
 
-from apscheduler.schedulers.background import BackgroundScheduler
-
-
 app = Flask(__name__)
 CORS(app, resources={
-     r"/api/*": {"origins": ["https://adugo-game-prd.onrender.com", "http://127.0.0.1:5500"]}})
+     r"/api/*": {"origins": ["https://adugo-game-prd.onrender.com/", "http://127.0.0.1:5500"]}})
 
 database = 'JogoOnca'
 user = 'MasterOnca'
@@ -239,6 +236,7 @@ def check_game_status():
         return jsonify(status="fail"), 404
 
 
+@app.route('/api/get_game_status', methods=['POST'])
 def create_game_party():
     fila = session.query(Fila).all()
     temas = set()
@@ -269,10 +267,6 @@ def create_game_party():
                     session.delete(jogador)
                 session.commit()
 
-
-scheduler = BackgroundScheduler()
-scheduler.add_job(func=create_game_party, trigger="interval", seconds=1)
-scheduler.start()
 
 if __name__ == "__main__":
     app.run(port=5003)
