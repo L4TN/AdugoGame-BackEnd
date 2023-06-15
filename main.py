@@ -119,6 +119,40 @@ def send_move():
         return jsonify(status="error"), 500
 
 
+@app.route('/api/send-audio', methods=['POST'])
+def send_audio():
+    session_id = request.json.get('session_id')
+    print(session_id)
+    audio_id = request.json['audio_id']
+    print(audio_id)
+    file_path = f"last_audio_{session_id}.txt"
+
+    try:
+        with open(file_path, 'w') as file:
+            file.write(json.dumps(audio_id))
+        return "", 200
+    except Exception as e:
+        print(f"Error writing to file: {e}")
+        return jsonify(status="error"), 500
+
+
+@app.route('/api/send-gif', methods=['POST'])
+def send_gif():
+    session_id = request.json.get('session_id')
+    print(session_id)
+    gif_id = request.json['gif_id']
+    print(gif_id)
+    file_path = f"last_gif_{session_id}.txt"
+
+    try:
+        with open(file_path, 'w') as file:
+            file.write(json.dumps(gif_id))
+        return "", 200
+    except Exception as e:
+        print(f"Error writing to file: {e}")
+        return jsonify(status="error"), 500
+
+
 @app.route('/api/register', methods=['POST'])
 def register():
     nome = request.args.get('Nome')
